@@ -26,13 +26,19 @@ public class MyFrame extends JFrame {
         this.setVisible(true);
         this.setLayout(new FlowLayout());
 
-        mainPanel = new JPanel(new GridBagLayout());
+
+
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(Color.RED);
 
         mainPanel.add(loginDescriptionLabel);
         mainPanel.add(usernameField);
         mainPanel.add(passwordField);
         mainPanel.add(loginDescriptionLabel);
+        mainPanel.add(loginButton);
+        mainPanel.add(cancelButton);
+        mainPanel.setSize(new Dimension(600,600));
 
         loginButton.addActionListener((event) -> handleUserLogin(event) );
 
