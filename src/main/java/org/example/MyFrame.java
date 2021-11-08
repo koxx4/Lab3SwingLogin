@@ -6,9 +6,12 @@ import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MyFrame extends JFrame {
+public final class MyFrame extends JFrame {
 
-    JPanel mainPanel;
+    final int WINDOW_WIDTH = 600;
+    final int WINDOW_HEIGHT = 600;
+    JPanel mainPanel = new JPanel();
+    JPanel buttonsPanel = new JPanel();
     JLabel loginStatusInfo;
     JButton loginButton = new JButton("Login");
     JButton cancelButton = new JButton("Cancel");
@@ -21,28 +24,33 @@ public class MyFrame extends JFrame {
         super(title);
         this.populateDummyUserData();
 
-        this.setSize(new Dimension(600,600));
+        this.setSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
-        this.setLayout(new FlowLayout());
+        this.setLayout(new BorderLayout());
 
+        initializeComponents();
 
+        mainPanel.add(buttonsPanel);
+        this.add(mainPanel, BorderLayout.CENTER);
+    }
 
-        mainPanel = new JPanel();
+    private void initializeComponents() {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(Color.RED);
+        mainPanel.setBackground(Color.YELLOW);
+        buttonsPanel.setBackground(Color.YELLOW);
+        buttonsPanel.setLayout(new FlowLayout());
 
         mainPanel.add(loginDescriptionLabel);
+        usernameField.setMaximumSize(new Dimension((int) (WINDOW_WIDTH * 0.8), 100));
+        passwordField.setMaximumSize(new Dimension((int) (WINDOW_WIDTH * 0.8), 100));
         mainPanel.add(usernameField);
         mainPanel.add(passwordField);
-        mainPanel.add(loginDescriptionLabel);
-        mainPanel.add(loginButton);
-        mainPanel.add(cancelButton);
-        mainPanel.setSize(new Dimension(600,600));
+        buttonsPanel.add(loginButton);
+        buttonsPanel.add(cancelButton);
 
-        loginButton.addActionListener((event) -> handleUserLogin(event) );
-
-        this.add(mainPanel);
+        loginButton.addActionListener( (event) -> handleUserLogin(event) );
+        cancelButton.addActionListener( (event) -> clearUserLoginForms() );
     }
 
     private void populateDummyUserData(){
@@ -53,15 +61,40 @@ public class MyFrame extends JFrame {
 
     private void handleUserLogin(ActionEvent event){
         String typedLogin = usernameField.getText();
-        String typedPassword = passwordField.getPassword().toString();
+        String typedPassword = String.valueOf(passwordField.getPassword());
 
         if(userData.containsKey(typedLogin)){
             String userPassword = userData.get(typedLogin);
-            if(userPassword.equals(typedPassword)){
-                mainPanel.setBackground(Color.GREEN);
-                mainPanel.add(new Label("LOGIN SUCCESSFUL!"));
-            }
+            if(userPassword.equals(typedPassword))
+                handleSuccessfulLogin();
         }
+        else
+            handleUnsuccessfulLogin();
+    }
+
+    private void clearUserLoginForms(){
+        this.passwordField.setText("");
+        this.usernameField.setText("");
+    }
+
+    private void handleSuccessfulLogin(){
+        mainPanel.setBackground(Color.GREEN);
+        buttonsPanel.setBackground(Color.GREEN);
+        JOptionPane.showMessageDialog(this,
+                "Successful login!",
+                "Yay!",
+                JOptionPane.INFORMATION_MESSAGE);
+        clearUserLoginForms();
+    }
+
+    private void handleUnsuccessfulLogin(){
+        mainPanel.setBackground(Color.RED);
+        buttonsPanel.setBackground(Color.RED);
+        JOptionPane.showMessageDialog(this,
+                "Invalid login!",
+                ":(",
+                JOptionPane.ERROR_MESSAGE);
+        this.clearUserLoginForms();
     }
 
 }
