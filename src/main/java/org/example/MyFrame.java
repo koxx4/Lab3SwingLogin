@@ -1,6 +1,7 @@
 package org.example;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
@@ -10,18 +11,16 @@ public final class MyFrame extends JFrame {
 
     private final int WINDOW_WIDTH = 600;
     private final int WINDOW_HEIGHT = 600;
-    private final Color NEUTRAL_PANEL_COLOR = Color.YELLOW;
     private final Color FAILURE_PANEL_COLOR = Color.RED;
     private final Color SUCCESS_PANEL_COLOR = Color.GREEN;
-    private JPanel mainPanel = new JPanel();
-    private JPanel inputFieldsPanel = new JPanel();
-    private JPanel buttonsPanel = new JPanel();
-    private JButton loginButton = new JButton("Login");
-    private JButton cancelButton = new JButton("Cancel");
-    private JPasswordField passwordField = new JPasswordField();
-    private JTextField usernameField = new JTextField();
-    private JLabel loginDescriptionLabel = new JLabel("Type in your login and password! We will not steal your data :) !");
-    private Map<String, String> userData = new HashMap();
+    private final JPanel mainPanel = new JPanel();
+    private final JButton loginButton = new JButton("Login");
+    private final JButton cancelButton = new JButton("Cancel");
+    private final JPasswordField passwordField = new JPasswordField();
+    private final JTextField usernameField = new JTextField();
+    private final JLabel loginDescriptionLabel = new JLabel("Type in your login and password! We will not steal your data :) !");
+    private final JMenuBar menuBar = new JMenuBar();
+    private final Map<String, String> userData = new HashMap();
 
     public MyFrame(String title) throws HeadlessException{
         super(title);
@@ -36,31 +35,78 @@ public final class MyFrame extends JFrame {
     }
 
     private void initializeComponents() {
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        inputFieldsPanel.setLayout(new BoxLayout(inputFieldsPanel, BoxLayout.Y_AXIS));
-        buttonsPanel.setLayout(new FlowLayout());
+        var gbc = new GridBagConstraints();
+        mainPanel.setLayout(new GridBagLayout());
 
-        inputFieldsPanel.setMaximumSize(new Dimension((int)(0.8 * WINDOW_WIDTH), 200));
+        gbc.insets = new Insets(5,5,5,5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        mainPanel.add(loginDescriptionLabel, gbc);
 
-        mainPanel.setBackground(NEUTRAL_PANEL_COLOR);
-        inputFieldsPanel.setBackground(NEUTRAL_PANEL_COLOR);
-        buttonsPanel.setBackground(NEUTRAL_PANEL_COLOR);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        mainPanel.add(new JLabel("Login: "), gbc);
 
-        inputFieldsPanel.add(new Label("Login:"));
-        inputFieldsPanel.add(usernameField);
-        inputFieldsPanel.add(new Label("Password:"));
-        inputFieldsPanel.add(passwordField);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        mainPanel.add(usernameField, gbc);
 
-        mainPanel.add(loginDescriptionLabel);
-        mainPanel.add(inputFieldsPanel);
-        buttonsPanel.add(loginButton);
-        buttonsPanel.add(cancelButton);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        mainPanel.add(new JLabel("Password: "), gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 3;
+        mainPanel.add(passwordField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        mainPanel.add(loginButton, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        mainPanel.add(cancelButton, gbc);
+
+        passwordField.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        usernameField.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        initializeMenuBar();
 
         loginButton.addActionListener( (event) -> handleUserLogin(event) );
         cancelButton.addActionListener( (event) -> clearUserLoginForms() );
 
-        mainPanel.add(buttonsPanel);
         this.add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private void initializeMenuBar() {
+        var jMenu = new JMenu("Help");
+        var possibleLoginsHintItem = new JMenuItem("All possible logins");
+        possibleLoginsHintItem.addActionListener((event) -> showPossibleLoginsDialog());
+        jMenu.add(possibleLoginsHintItem);
+        menuBar.add(jMenu);
+        setJMenuBar(this.menuBar);
+    }
+
+    private void showPossibleLoginsDialog() {
+        StringBuilder loginsMessageBuilder = new StringBuilder();
+        for(var login : this.userData.keySet())
+            loginsMessageBuilder.append(String.format("Login: %s, password: %s \n",
+                    login,
+                    this.userData.get(login)));
+
+
+        JOptionPane.showMessageDialog(this,
+                loginsMessageBuilder.toString(),
+                "Confidential ;)",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void populateDummyUserData(){
@@ -89,9 +135,8 @@ public final class MyFrame extends JFrame {
 
     private void handleSuccessfulLogin(){
         mainPanel.setBackground(SUCCESS_PANEL_COLOR);
-        buttonsPanel.setBackground(SUCCESS_PANEL_COLOR);
         JOptionPane.showMessageDialog(this,
-                "Successful login!",
+                "Successful login! \u2611",
                 "Yay!",
                 JOptionPane.INFORMATION_MESSAGE);
         clearUserLoginForms();
@@ -99,9 +144,8 @@ public final class MyFrame extends JFrame {
 
     private void handleUnsuccessfulLogin(){
         mainPanel.setBackground(FAILURE_PANEL_COLOR);
-        buttonsPanel.setBackground(FAILURE_PANEL_COLOR);
         JOptionPane.showMessageDialog(this,
-                "Invalid login!",
+                "Invalid login! \u274c",
                 ":(",
                 JOptionPane.ERROR_MESSAGE);
         this.clearUserLoginForms();
