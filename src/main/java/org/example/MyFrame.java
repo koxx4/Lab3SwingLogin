@@ -8,17 +8,20 @@ import java.util.Map;
 
 public final class MyFrame extends JFrame {
 
-    final int WINDOW_WIDTH = 600;
-    final int WINDOW_HEIGHT = 600;
-    JPanel mainPanel = new JPanel();
-    JPanel buttonsPanel = new JPanel();
-    JLabel loginStatusInfo;
-    JButton loginButton = new JButton("Login");
-    JButton cancelButton = new JButton("Cancel");
-    JPasswordField passwordField = new JPasswordField();
-    JTextField usernameField = new JTextField();
-    JLabel loginDescriptionLabel = new JLabel("Type in your login and password! We will not steal your data :) !");
-    Map<String, String> userData = new HashMap();
+    private final int WINDOW_WIDTH = 600;
+    private final int WINDOW_HEIGHT = 600;
+    private final Color NEUTRAL_PANEL_COLOR = Color.YELLOW;
+    private final Color FAILURE_PANEL_COLOR = Color.RED;
+    private final Color SUCCESS_PANEL_COLOR = Color.GREEN;
+    private JPanel mainPanel = new JPanel();
+    private JPanel inputFieldsPanel = new JPanel();
+    private JPanel buttonsPanel = new JPanel();
+    private JButton loginButton = new JButton("Login");
+    private JButton cancelButton = new JButton("Cancel");
+    private JPasswordField passwordField = new JPasswordField();
+    private JTextField usernameField = new JTextField();
+    private JLabel loginDescriptionLabel = new JLabel("Type in your login and password! We will not steal your data :) !");
+    private Map<String, String> userData = new HashMap();
 
     public MyFrame(String title) throws HeadlessException{
         super(title);
@@ -30,27 +33,34 @@ public final class MyFrame extends JFrame {
         this.setLayout(new BorderLayout());
 
         initializeComponents();
-
-        mainPanel.add(buttonsPanel);
-        this.add(mainPanel, BorderLayout.CENTER);
     }
 
     private void initializeComponents() {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(Color.YELLOW);
-        buttonsPanel.setBackground(Color.YELLOW);
+        inputFieldsPanel.setLayout(new BoxLayout(inputFieldsPanel, BoxLayout.Y_AXIS));
         buttonsPanel.setLayout(new FlowLayout());
 
+        inputFieldsPanel.setMaximumSize(new Dimension((int)(0.8 * WINDOW_WIDTH), 200));
+
+        mainPanel.setBackground(NEUTRAL_PANEL_COLOR);
+        inputFieldsPanel.setBackground(NEUTRAL_PANEL_COLOR);
+        buttonsPanel.setBackground(NEUTRAL_PANEL_COLOR);
+
+        inputFieldsPanel.add(new Label("Login:"));
+        inputFieldsPanel.add(usernameField);
+        inputFieldsPanel.add(new Label("Password:"));
+        inputFieldsPanel.add(passwordField);
+
         mainPanel.add(loginDescriptionLabel);
-        usernameField.setMaximumSize(new Dimension((int) (WINDOW_WIDTH * 0.8), 100));
-        passwordField.setMaximumSize(new Dimension((int) (WINDOW_WIDTH * 0.8), 100));
-        mainPanel.add(usernameField);
-        mainPanel.add(passwordField);
+        mainPanel.add(inputFieldsPanel);
         buttonsPanel.add(loginButton);
         buttonsPanel.add(cancelButton);
 
         loginButton.addActionListener( (event) -> handleUserLogin(event) );
         cancelButton.addActionListener( (event) -> clearUserLoginForms() );
+
+        mainPanel.add(buttonsPanel);
+        this.add(mainPanel, BorderLayout.CENTER);
     }
 
     private void populateDummyUserData(){
@@ -78,8 +88,8 @@ public final class MyFrame extends JFrame {
     }
 
     private void handleSuccessfulLogin(){
-        mainPanel.setBackground(Color.GREEN);
-        buttonsPanel.setBackground(Color.GREEN);
+        mainPanel.setBackground(SUCCESS_PANEL_COLOR);
+        buttonsPanel.setBackground(SUCCESS_PANEL_COLOR);
         JOptionPane.showMessageDialog(this,
                 "Successful login!",
                 "Yay!",
@@ -88,8 +98,8 @@ public final class MyFrame extends JFrame {
     }
 
     private void handleUnsuccessfulLogin(){
-        mainPanel.setBackground(Color.RED);
-        buttonsPanel.setBackground(Color.RED);
+        mainPanel.setBackground(FAILURE_PANEL_COLOR);
+        buttonsPanel.setBackground(FAILURE_PANEL_COLOR);
         JOptionPane.showMessageDialog(this,
                 "Invalid login!",
                 ":(",
